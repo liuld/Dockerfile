@@ -1,13 +1,6 @@
-FROM linchqd/centos7.6:base
+FROM centos:centos7
 
-RUN yum -y install wget && \
-    cd /etc/yum.repos.d/ && \
-    rm -rf ./* && \
-    wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo && \
-    sed  -i '/aliyuncs/d' /etc/yum.repos.d/CentOS-Base.repo && \
-    wget -O /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo && \
-    sed -i '/aliyuncs/d' /etc/yum.repos.d/epel.repo && \
-    yum -y install --setopt=tsflags=nodocs epel-release && \
+RUN yum -y install --setopt=tsflags=nodocs epel-release && \
     yum -y install --setopt=tsflags=nodocs mariadb-server bind-utils pwgen psmisc hostname && \
     yum -y erase vim-minimal && \
     yum -y update && yum clean all && \
@@ -16,7 +9,8 @@ RUN yum -y install wget && \
 
 # Fix permissions to allow for running on openshift
 COPY fix-permissions.sh ./
-RUN ./fix-permissions.sh /var/lib/mysql/   && \
+RUN chmod +x fix-permissions.sh && \
+    ./fix-permissions.sh /var/lib/mysql/   && \
     ./fix-permissions.sh /var/log/mariadb/ && \
     ./fix-permissions.sh /var/run/
 
